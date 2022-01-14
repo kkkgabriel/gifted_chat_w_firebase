@@ -6,8 +6,14 @@ import { GiftedChat } from 'react-native-gifted-chat'
 
 const db = firebase.firestore().collection('messages')
 
-const ChatScreen = ({ navigation }) => {
+const ChatScreen = ({ route, navigation }) => {
 	const [messages, setMessages] = useState([])
+	let id = ''
+	let email = ''
+	try {
+		id = route.params.id
+		email = route.params.email
+	} catch { }
 
 	useEffect(() => {
 
@@ -32,7 +38,8 @@ const ChatScreen = ({ navigation }) => {
 		firebase.auth().onAuthStateChanged((user) => {
 			if (user) {
 				// logged in 
-				navigation.navigate("Chat", { id: user.id, email: user.email })
+				console.log(user)
+				navigation.navigate("Chat", { id: user.uid, email: user.email })
 			} else {
 				// logged out, get kicked back to the login page
 				navigation.navigate('Login')
@@ -80,14 +87,6 @@ const ChatScreen = ({ navigation }) => {
 
 		db.add(newMessages[0])
 	}
-
-	const see = () => {
-		console.log('seeing')
-		// console.log(firebase.auth().currentUser)
-		console.log(firebase.auth().currentUser.uid)
-		console.log(firebase.auth().currentUser.email)
-	}
-
 	return (
 		<GiftedChat
 			messages={messages}
@@ -99,13 +98,10 @@ const ChatScreen = ({ navigation }) => {
 				},
 			}}
 			user={{
-				_id: firebase.auth().currentUser.uid,
-				name: firebase.auth().currentUser.email
-				// _id: 1,
-				// name: 'a@a.com'
+				_id: id,
+				name: email
 			}}
 		/>
-		// <View><Button onPress={see} title='potato'/></View>
 	);
 }
 
